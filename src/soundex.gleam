@@ -38,16 +38,15 @@ fn calc_soundex_code(original_name: String, first_letter: String) -> String {
       dict.get(code_lookup, value) |> result.unwrap(value)
     })
     |> clean_doubles("", "", special_consonants)
-    |> string.to_graphemes()
-    |> list.filter(fn(x) { !regexp.check(letters_to_remove_regex, x) })
-    |> string.join("")
+  let soundex_code_vowel_sounds_removed =
+    regexp.replace(letters_to_remove_regex, soundex_missing_start, "")
 
   let soundex_code = case
     regexp.check(letters_to_remove_regex, string.lowercase(first_letter))
   {
-    True -> first_letter <> soundex_missing_start
-
-    False -> first_letter <> string.drop_start(soundex_missing_start, 1)
+    True -> first_letter <> soundex_code_vowel_sounds_removed
+    False ->
+      first_letter <> string.drop_start(soundex_code_vowel_sounds_removed, 1)
   }
   // make a max 4 letter code padded with zeroes
   soundex_code |> string.slice(0, 4) |> string.pad_end(4, "0")
